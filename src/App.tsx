@@ -38,20 +38,6 @@ function App() {
     mat[START_X][START_Y] = CELL_TYPE.START;
     mat[END_X][END_Y] = CELL_TYPE.END;
 
-    pMat[START_X][START_Y] = true;
-
-    if (START_Y > END_Y) {
-      for (let i = END_Y; i < START_Y; i++) pMat[START_X][i] = true;
-    } else {
-      for (let i = START_Y; i <= END_Y; i++) pMat[START_X][i] = true;
-    }
-
-    if(START_X > END_X){
-      for (let i = END_X; i < START_X; i++) pMat[i][END_Y] = true;
-    } else {
-      for (let i = START_X; i <= END_X; i++) pMat[i][END_Y] = true;
-    }
-
     setMatrix(mat);
     setPathMatrix(pMat);
   }, []);
@@ -71,10 +57,34 @@ function App() {
     });
   };
 
+  const renderSimplePath = () => {
+    const pMat: boolean[][] = [...pathMatrix];
+    if (START_Y > END_Y) {
+      for (let i = END_Y; i < START_Y; i++) pMat[START_X][i] = true;
+    } else {
+      for (let i = START_Y; i <= END_Y; i++) pMat[START_X][i] = true;
+    }
+
+    if (START_X > END_X) {
+      for (let i = END_X; i < START_X; i++) pMat[i][END_Y] = true;
+    } else {
+      for (let i = START_X; i <= END_X; i++) pMat[i][END_Y] = true;
+    }
+    setPathMatrix(pMat);
+  };
+
+  const resetPath = () => {
+    const pMat: boolean[][] = [...pathMatrix];
+    for (let i = 0; i < ROWS; i++)
+      for (let j = 0; j < COLUMNS; j++) pMat[i][j] = false;
+    setPathMatrix(pMat);
+  };
+
   return (
     <div className="App">
       {renderGrid()}
-      <button>START</button>
+      <button onClick={renderSimplePath}>SIMPLE PATH</button>
+      <button onClick={resetPath}>RESET</button>
     </div>
   );
 }
