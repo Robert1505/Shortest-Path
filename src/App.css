@@ -1,12 +1,27 @@
+html {
+  height: 100vh;
+  background-color: #343a40;
+}
+
+i{
+  color: white;
+}
+
 .grid{
   display: flex;
   flex-direction: row;
 }
 
 .grid > div {
-  background-color: white;
-  border: 1px solid turquoise;
+  background-color: #343a40;
+  border: 1px solid #6c757d;
   width: 25px;
   height: 25px;
   text-align: center;
 }
+
+.grayIcon > i {
+  color: #343a40;
+}
+
+/* dark theme */
