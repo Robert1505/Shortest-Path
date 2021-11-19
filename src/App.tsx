@@ -1,15 +1,21 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
 import Cell from "./Cell";
+import { delay } from "./Helpers/delay";
+import { floodFillRecursiveHelper } from "./Helpers/floodFillHelper";
+import {Move} from './Types';
 
-const ROWS = 22;
-const COLUMNS = 61;
+export const dx = [-1, 0, 1, 0, -1, -1, 1, 1];
+export const dy = [0, 1, 0, -1, -1, 1, 1, -1];
+
+export const ROWS = 22;
+export const COLUMNS = 61;
 
 const START_X = 12;
-const START_Y = 0;
+const START_Y = 24;
 
-const END_X = 10;
-const END_Y = 10;
+const END_X = 3;
+const END_Y = 3;
 
 export enum CELL_TYPE {
   EMPTY = 0,
@@ -21,26 +27,39 @@ export enum CELL_TYPE {
 function App() {
   const [matrix, setMatrix] = useState<CELL_TYPE[][]>([]);
   const [pathMatrix, setPathMatrix] = useState<boolean[][]>([]);
+  const [moveHistory, setMoveHistory] = useState<Move[]>([]); /// [{2, 3}, {2, 4}, {2, 5}] moveHistory.push()
+  const [activeCells, setActiveCells] = useState<boolean[][]>([]);
 
   useEffect(() => {
     const mat = [];
     const pMat = [];
+    const aMat = [];
     for (let i = 1; i <= ROWS; i++) {
       const row = [];
       const pRow = [];
+      const aRow = [];
       for (let j = 0; j < COLUMNS; j++) {
         row.push(CELL_TYPE.EMPTY);
         pRow.push(false);
+        aRow.push(false);
       }
       mat.push(row);
       pMat.push(pRow);
+      aMat.push(aRow);
     }
     mat[START_X][START_Y] = CELL_TYPE.START;
     mat[END_X][END_Y] = CELL_TYPE.END;
 
     setMatrix(mat);
     setPathMatrix(pMat);
+    setActiveCells(aMat);
   }, []);
+
+  useEffect(() => {
+    if (moveHistory.length > 0) {
+      simulatePath();
+    }
+  }, [moveHistory])
 
   const renderGrid = () => {
     return matrix.map((row: any, rowIndex: number) => {
@@ -49,7 +68,7 @@ function App() {
           {row.map((cellType: CELL_TYPE, columnIndex: number) => (
             <Cell
               cellType={cellType}
-              isYellow={pathMatrix?.[rowIndex]?.[columnIndex]}
+              isYellow={activeCells?.[rowIndex]?.[columnIndex]}
             />
           ))}
         </div>
@@ -59,17 +78,39 @@ function App() {
 
   const renderSimplePath = () => {
     const pMat: boolean[][] = [...pathMatrix];
+    const newMoveHistory : Move[] = [...moveHistory];
     if (START_Y > END_Y) {
-      for (let i = END_Y; i < START_Y; i++) pMat[START_X][i] = true;
+      for (let i = START_Y; i >= END_Y; i--) {
+        pMat[START_X][i] = true;
+        newMoveHistory.push({positionX: START_X, positionY: i})
+      }
     } else {
-      for (let i = START_Y; i <= END_Y; i++) pMat[START_X][i] = true;
+      for (let i = START_Y; i <= END_Y; i++) {
+        pMat[START_X][i] = true;
+        newMoveHistory.push({positionX: START_X, positionY: i})
+      }
     }
 
     if (START_X > END_X) {
-      for (let i = END_X; i < START_X; i++) pMat[i][END_Y] = true;
+      for (let i = START_X; i >= END_X; i--) {
+        pMat[i][END_Y] = true;
+        newMoveHistory.push({positionX: i, positionY: END_Y})
+      } 
     } else {
-      for (let i = START_X; i <= END_X; i++) pMat[i][END_Y] = true;
+      for (let i = START_X; i <= END_X; i++) {
+        pMat[i][END_Y] = true;
+        newMoveHistory.push({positionX: i, positionY: END_Y})
+      } 
     }
+
+    setPathMatrix(pMat);
+    setMoveHistory(newMoveHistory);
+  };
+
+  const renderDFSPath = () => {
+    const pMat: boolean[][] = [...pathMatrix];
+
+    floodFillRecursiveHelper(pMat, START_X, START_Y);
     setPathMatrix(pMat);
   };
 
@@ -80,10 +121,21 @@ function App() {
     setPathMatrix(pMat);
   };
 
+  const simulatePath = async () => {
+    for(let i = 0; i < moveHistory.length; i++){
+      const newActiveCells = [...activeCells];
+      await delay(100).then(() => {
+        newActiveCells[moveHistory[i].positionX][moveHistory[i].positionY] = true;
+      })
+      setActiveCells(newActiveCells);
+    }
+  }
+
   return (
     <div className="App">
       {renderGrid()}
       <button onClick={renderSimplePath}>SIMPLE PATH</button>
+      <button onClick={renderDFSPath}>DFS PATH</button>
       <button onClick={resetPath}>RESET</button>
     </div>
   );
