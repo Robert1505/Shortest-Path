@@ -67,6 +67,11 @@ function App() {
         <div className="grid" key={`row-${rowIndex}`}>
           {row.map((cellType: CELL_TYPE, columnIndex: number) => (
             <Cell
+              handleLeftClick = {() => {
+                const newMatrix = [...matrix];
+                newMatrix[rowIndex][columnIndex] = CELL_TYPE.WALL
+                setMatrix(newMatrix);
+              }}
               cellType={cellType}
               isYellow={activeCells?.[rowIndex]?.[columnIndex]}
             />
@@ -110,7 +115,7 @@ function App() {
   const renderDFSPath = () => {
     const pMat: boolean[][] = [...pathMatrix];
     const newMoveHistory : Move[] = [...moveHistory];
-    floodFillRecursiveHelper(pMat, START_X, START_Y, newMoveHistory);
+    floodFillRecursiveHelper(pMat, START_X, START_Y, newMoveHistory, matrix);
     setPathMatrix(pMat);
     setMoveHistory(newMoveHistory);
   };
