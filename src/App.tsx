@@ -14,8 +14,8 @@ export const COLUMNS = 61;
 const START_X = 12;
 const START_Y = 24;
 
-const END_X = 3;
-const END_Y = 3;
+export const END_X = 5;
+export const END_Y = 40;
 
 export enum CELL_TYPE {
   EMPTY = 0,
@@ -109,9 +109,10 @@ function App() {
 
   const renderDFSPath = () => {
     const pMat: boolean[][] = [...pathMatrix];
-
-    floodFillRecursiveHelper(pMat, START_X, START_Y);
+    const newMoveHistory : Move[] = [...moveHistory];
+    floodFillRecursiveHelper(pMat, START_X, START_Y, newMoveHistory);
     setPathMatrix(pMat);
+    setMoveHistory(newMoveHistory);
   };
 
   const resetPath = () => {
@@ -124,7 +125,7 @@ function App() {
   const simulatePath = async () => {
     for(let i = 0; i < moveHistory.length; i++){
       const newActiveCells = [...activeCells];
-      await delay(100).then(() => {
+      await delay(500 / moveHistory.length).then(() => {
         newActiveCells[moveHistory[i].positionX][moveHistory[i].positionY] = true;
       })
       setActiveCells(newActiveCells);
