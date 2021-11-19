@@ -6,7 +6,8 @@ export const floodFillRecursiveHelper = (
   squares: boolean[][],
   i: number,
   j: number,
-  moveHistory: Move[]
+  moveHistory: Move[],
+  matrix: CELL_TYPE[][]
 ) => {
   // check out of bounds
   if (i < 0 || i >= ROWS) return 0;
@@ -20,7 +21,13 @@ export const floodFillRecursiveHelper = (
   moveHistory.push({ positionX: i, positionY: j });
 
   for (let a = 0; a < 4; a++) {
-    floodFillRecursiveHelper(squares, i + dx[a], j + dy[a], moveHistory);
+    const newRow = i + dx[a];
+    const newColumn = j + dy[a];
+    if (newRow < 0 || newRow >= ROWS || newColumn < 0 || newColumn >= COLUMNS)
+      return 0;
+      
+    if (matrix[newRow][newColumn] !== CELL_TYPE.WALL)
+      floodFillRecursiveHelper(squares, newRow, newColumn, moveHistory, matrix);
   }
 };
 

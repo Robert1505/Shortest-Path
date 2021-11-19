@@ -4,6 +4,7 @@ import { CELL_TYPE } from "./App";
 interface Props {
   cellType: CELL_TYPE;
   isYellow: boolean;
+  handleLeftClick: Function;
 }
 
 export default function Cell(props: Props): ReactElement {
@@ -18,7 +19,7 @@ export default function Cell(props: Props): ReactElement {
   };
 
   return (
-    <div style={{ backgroundColor: isYellow ? "yellow" : "#343a40" }}>
+    <div onClick={() => props.handleLeftClick()} style={{ backgroundColor: isYellow ? "yellow" : "#343a40" }}>
       <div className={isYellow ? "grayIcon" : ""}>{renderIcon()}</div>
     </div>
   );
