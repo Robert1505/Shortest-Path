@@ -122,9 +122,16 @@ function App() {
 
   const resetPath = () => {
     const pMat: boolean[][] = [...pathMatrix];
+    const newActiveCells = [...activeCells];
     for (let i = 0; i < ROWS; i++)
-      for (let j = 0; j < COLUMNS; j++) pMat[i][j] = false;
+      for (let j = 0; j < COLUMNS; j++){
+        pMat[i][j] = false;
+        newActiveCells[i][j] = false;
+      } 
+    setMoveHistory([]);
     setPathMatrix(pMat);
+    setActiveCells(newActiveCells);
+
   };
 
   const simulatePath = async () => {
